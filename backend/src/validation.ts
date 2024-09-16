@@ -11,4 +11,9 @@ const userSignin = z.object({
   password: z.string().min(6),
 });
 
-export { userSignin, userSignup };
+const createTodo = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+});
+
+export { createTodo, userSignin, userSignup };
