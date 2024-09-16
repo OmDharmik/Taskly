@@ -34,7 +34,6 @@ router.post(
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated.' });
       }
-
       const response = await prisma.todo.create({
         data: {
           title: data.title,
@@ -44,7 +43,7 @@ router.post(
         },
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         status: true,
         msg: 'Added successfully',
         todo: response,
@@ -55,6 +54,27 @@ router.post(
     }
   }
 );
+
+//read all Todo
+
+router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    return res.send('User not logged in');
+  }
+  const user = req?.user;
+
+  const todo = await prisma.todo.findMany({
+    where: {
+      userId: user.id,
+    },
+  });
+
+  res.status(200).json({
+    status: true,
+    msg: 'fetched data successfully',
+    data: todo,
+  });
+});
 
 //update Todo
 
@@ -92,5 +112,33 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
     });
   }
 });
+
+//delete Todo
+
+router.delete(
+  '/:id',
+  authMiddleware,
+  async (req: AuthRequest, res: Response) => {
+    const id = Number(req.params.id);
+
+    try {
+      await prisma.todo.delete({
+        where: {
+          id: id,
+        },
+      });
+
+      res.status(200).json({
+        status: true,
+        msg: 'Record deleted successfuly',
+      });
+    } catch (error) {
+      return res.status(400).json({
+        status: false,
+        msg: 'record does not exist',
+      });
+    }
+  }
+);
 
 export default router;

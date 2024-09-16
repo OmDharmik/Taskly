@@ -46,8 +46,13 @@ router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function*
     });
 }));
 router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = validation_1.userSignin.safeParse(req.body);
-    const user = body === null || body === void 0 ? void 0 : body.data;
+    try {
+        const body = validation_1.userSignin.safeParse(req.body);
+    }
+    catch (error) {
+        return res.json({ status: false, error: error });
+    }
+    const user = req.body;
     const secret = process.env.SECRET_KEY || 'default_secret';
     const userExist = yield db_1.default.user.findUnique({
         where: {

@@ -40,8 +40,13 @@ router.post('/signup', async (req: Request, res: Response) => {
 });
 
 router.post('/signin', async (req: Request, res: Response) => {
-  const body = userSignin.safeParse(req.body);
-  const user = body?.data;
+  try {
+    const body = userSignin.safeParse(req.body);
+  } catch (error) {
+    return res.json({ status: false, error: error });
+  }
+
+  const user = req.body;
   const secret = process.env.SECRET_KEY || 'default_secret';
 
   const userExist = await prisma.user.findUnique({

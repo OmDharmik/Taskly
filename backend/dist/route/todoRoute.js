@@ -39,7 +39,7 @@ router.post('/create', middleware_1.default, (req, res) => __awaiter(void 0, voi
                 userId: req.user.id,
             },
         });
-        res.status(200).json({
+        return res.status(200).json({
             status: true,
             msg: 'Added successfully',
             todo: response,
@@ -49,6 +49,23 @@ router.post('/create', middleware_1.default, (req, res) => __awaiter(void 0, voi
         console.error('Error creating todo:', error);
         res.status(500).json({ status: false, message: 'Internal Server Error' });
     }
+}));
+//read all Todo
+router.get('/', middleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.user) {
+        return res.send('User not logged in');
+    }
+    const user = req === null || req === void 0 ? void 0 : req.user;
+    const todo = yield db_1.default.todo.findMany({
+        where: {
+            userId: user.id,
+        },
+    });
+    res.status(200).json({
+        status: true,
+        msg: 'fetched data successfully',
+        data: todo,
+    });
 }));
 //update Todo
 router.put('/:id', middleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -78,6 +95,27 @@ router.put('/:id', middleware_1.default, (req, res) => __awaiter(void 0, void 0,
         return res.status(400).json({
             status: false,
             msg: 'failed to update',
+        });
+    }
+}));
+//delete Todo
+router.delete('/:id', middleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = Number(req.params.id);
+    try {
+        yield db_1.default.todo.delete({
+            where: {
+                id: id,
+            },
+        });
+        res.status(200).json({
+            status: true,
+            msg: 'Record deleted successfuly',
+        });
+    }
+    catch (error) {
+        return res.status(400).json({
+            status: false,
+            msg: 'record does not exist',
         });
     }
 }));
